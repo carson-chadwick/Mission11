@@ -24,7 +24,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors(x => x.WithOrigins("http://localhost:3001"));
+app.UseCors(x => x.WithOrigins("http://localhost:3002"));
 
 app.UseHttpsRedirection();
 
