@@ -18,10 +18,15 @@ namespace mission11api.Controllers
 
         // GET method to retrieve books with pagination and sorting options
         [HttpGet("AllBooks")]
-        public IActionResult GetBooks(int pageSize = 5, int pageNum = 1, string sortBy = "title", string sortOrder = "asc")
+        public IActionResult GetBooks(int pageSize = 5, int pageNum = 1, string sortBy = "title", string sortOrder = "asc", [FromQuery] List<string>? bookCategories = null)
         {
             // Start with a queryable list of all books in the database
             var booksQuery = _bookContext.Books.AsQueryable();
+
+            if (bookCategories != null && bookCategories.Any())
+            {
+                booksQuery = booksQuery.Where(b => bookCategories.Contains(b.Category));
+            }
 
             // Apply sorting based on 'sortBy' and 'sortOrder' query parameters
             if (sortBy.ToLower() == "title")
@@ -31,6 +36,8 @@ namespace mission11api.Controllers
                     ? booksQuery.OrderBy(b => b.Title) // Ascending order
                     : booksQuery.OrderByDescending(b => b.Title); // Descending order
             }
+            // Calculate the total number of books in the database
+            var totalNumBooks = booksQuery.Count();
 
             // Apply pagination: skip the books of previous pages and take the books for the current page
             var books = booksQuery
@@ -38,8 +45,7 @@ namespace mission11api.Controllers
                 .Take(pageSize)  // Take only the number of books specified by pageSize
                 .ToList();  // Execute the query and return the results as a list
 
-            // Calculate the total number of books in the database
-            var totalNumBooks = _bookContext.Books.Count();
+
 
             // Return the list of books along with the total number of books
             return Ok(new
@@ -47,6 +53,18 @@ namespace mission11api.Controllers
                 Books = books,  // List of books for the current page
                 TotalBooks = totalNumBooks  // Total number of books in the database
             });
+        }
+
+        [HttpGet("GetBookCategories")]
+        public IActionResult GetBookCategories ()
+        {
+            var bookCategories = _bookContext.Books
+                .Select(b  => b.Category)
+                .Distinct()
+                .ToList();
+
+                return Ok(bookCategories);
+
         }
     }
 }
