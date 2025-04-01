@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "JD5p90ssuPM=",
+  "dgSpecHash": "BKEEB0h0t/E=",
   "success": true,
-  "projectFilePath": "C:\\Users\\dcars\\OneDrive - Brigham Young University\\Winter 2025\\.net\\ReactCode\\Mission11\\backend\\Mission11.api\\mission11api.csproj",
+  "projectFilePath": "C:\\Users\\dcars\\OneDrive - Brigham Young University\\Winter 2025\\.net\\ReactCode\\Mission11\\backend\\Mission11.API\\mission11api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\dcars\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\dcars\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\6.0.0\\microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",

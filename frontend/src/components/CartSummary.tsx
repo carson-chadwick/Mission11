@@ -3,7 +3,7 @@ import { useCart } from "../context/CartContext";
 
 const CartSummary = () => {
   const navigate = useNavigate();
-  const { cart, getCartTotalPrice } = useCart(); // Destructure getCartTotalPrice from CartContext
+  const { getCartTotalPrice } = useCart(); // Destructure getCartTotalPrice from CartContext
 
   // Use getCartTotalPrice() to dynamically get the total amount
   const totalAmount = getCartTotalPrice();
