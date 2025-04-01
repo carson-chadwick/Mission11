@@ -135,3 +135,4 @@ C:\Users\dcars\OneDrive - Brigham Young University\Winter 2025\.net\ReactCode\Mi
 C:\Users\dcars\OneDrive - Brigham Young University\Winter 2025\.net\ReactCode\Mission11\backend\Mission11.API\obj\Debug\net8.0\mission11api.pdb
 C:\Users\dcars\OneDrive - Brigham Young University\Winter 2025\.net\ReactCode\Mission11\backend\Mission11.API\obj\Debug\net8.0\mission11api.genruntimeconfig.cache
 C:\Users\dcars\OneDrive - Brigham Young University\Winter 2025\.net\ReactCode\Mission11\backend\Mission11.API\obj\Debug\net8.0\ref\mission11api.dll
+C:\Users\dcars\OneDrive - Brigham Young University\Winter 2025\.net\ReactCode\Mission11\backend\Mission11.api\bin\Debug\net8.0\Bookstore.sqlite

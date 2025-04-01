@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\mission11api.props" />
+</Project>

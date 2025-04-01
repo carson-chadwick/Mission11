@@ -51,7 +51,7 @@ namespace mission11api.Controllers
             return Ok(new
             {
                 Books = books,  // List of books for the current page
-                TotalBooks = totalNumBooks  // Total number of books in the database
+                totalNumBooks = totalNumBooks  // Total number of books in the database
             });
         }
 
@@ -65,6 +65,66 @@ namespace mission11api.Controllers
 
                 return Ok(bookCategories);
 
+        }
+
+        [HttpPost("AddBook")]
+        public IActionResult AddBook([FromBody] Book newBook)
+        {
+            try
+            {
+                // Add the book to the database
+                _bookContext.Books.Add(newBook);
+                _bookContext.SaveChanges();
+                
+                // Return the added book as JSON
+                return Ok(newBook);  // Make sure to return JSON
+            }
+            catch (Exception ex)
+            {
+                // Log the error details
+                Console.Error.WriteLine($"Error adding book: {ex.Message}");
+                
+                // Return a specific error response
+                return StatusCode(500, new { message = "Internal server error: Failed to add book" });
+            }
+        }
+
+
+        [HttpPut("UpdateBook/{BookID}")]
+        public IActionResult UpdateBook(int BookID, [FromBody] Book updatedBook)
+        {
+            var existingBook = _bookContext.Books.Find(BookID);
+
+            existingBook.Title = updatedBook.Title;
+            existingBook.Author = updatedBook.Author;
+            existingBook.Publisher = updatedBook.Publisher;
+            existingBook.ISBN = updatedBook.ISBN;
+            existingBook.Classification = updatedBook.Classification;
+            existingBook.Category = updatedBook.Category;
+            existingBook.PageCount = updatedBook.PageCount;
+            existingBook.Price = updatedBook.Price;
+
+
+            _bookContext.Books.Update(existingBook);
+            _bookContext.SaveChanges();
+
+            return Ok(existingBook);
+        }
+
+        [HttpDelete("DeleteBook/{BookID}")]
+        public IActionResult DeleteBook(int BookID)
+        {
+            var book = _bookContext.Books.Find(BookID);
+
+            if (book == null)
+            {
+                return NotFound(new {message = "book not found"});
+            }
+
+            _bookContext.Books.Remove(book);
+            _bookContext.SaveChanges();
+
+            return NoContent();
         }
     }
 }

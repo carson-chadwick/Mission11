@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Book } from "../types/Book";
 import { useNavigate } from "react-router-dom";
+import { fetchBooks } from "../api/BooksAPI";
+import Pagination from "./Pagination";
 
 function BookList({ selectedCategories }: { selectedCategories: string[] }) {
   /**
@@ -12,35 +14,44 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
   const [totalPages, setTotalPages] = useState<number>(0); // Total number of pages
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc"); // Sorting order for books
   const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   /**
    * Fetches books from the backend API whenever page size, page number, or sorting order changes.
    */
   useEffect(() => {
-    const GetBooks = async () => {
-      const categoryParams = selectedCategories
-        .map((cat) => `bookCategories=${encodeURIComponent(cat)}`)
-        .join("&");
+    const loadBooks = async () => {
       try {
-        // API call to fetch books with sorting and pagination parameters
-        const response = await fetch(
-          `https://localhost:5000/Book/AllBooks?pageSize=${pageSize}&pageNum=${pageNum}&sortBy=title&sortOrder=${sortOrder}${selectedCategories.length ? `&${categoryParams}` : ""}`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch books");
-        }
-        const data = await response.json();
-
-        // Update state with the fetched data
+        setLoading(true);
+        const data = await fetchBooks(
+          pageSize,
+          pageNum,
+          selectedCategories,
+          sortOrder
+        ); // Pass sortOrder here
+        // Update state with fetched data
         setBooks(data.books);
-        setTotalPages(Math.ceil(data.totalBooks / pageSize)); // Calculate total pages
+
+        // Ensure totalNumBooks is valid before calculating totalPages
+        const totalNumBooks = data.totalNumBooks;
+        if (typeof totalNumBooks === "number" && totalNumBooks >= 0) {
+          setTotalPages(Math.ceil(totalNumBooks / pageSize)); // Calculate total pages
+        } else {
+          setTotalPages(0); // Set to 0 if totalNumBooks is invalid
+        }
       } catch (error) {
-        console.error("Error fetching books:", error);
+        setError((error as Error).message);
+      } finally {
+        setLoading(false);
       }
     };
 
-    GetBooks();
-  }, [pageSize, pageNum, sortOrder, selectedCategories]); // Dependencies ensure API call runs when values change
+    loadBooks(); // Invoke the function to fetch data
+  }, [pageSize, pageNum, selectedCategories, sortOrder]); // Add sortOrder to dependencies
+
+  if (loading) return <p>Loading books...</p>;
+  if (error) return <p className="text-red-500">Error: {error}</p>;
 
   return (
     <div className="container mt-4">
@@ -109,68 +120,16 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
         ))}
       </div>
 
-      {/* Pagination Controls */}
-      <div className="d-flex justify-content-center mt-3">
-        <nav>
-          <ul className="pagination">
-            {/* Previous Button */}
-            <li className={`page-item ${pageNum === 1 ? "disabled" : ""}`}>
-              <button
-                className="page-link"
-                onClick={() => setPageNum(pageNum - 1)}
-              >
-                Previous
-              </button>
-            </li>
-
-            {/* Page Number Buttons */}
-            {[...Array(totalPages)].map((_, index) => (
-              <li
-                key={index + 1}
-                className={`page-item ${pageNum === index + 1 ? "active" : ""}`}
-              >
-                <button
-                  className="page-link"
-                  onClick={() => setPageNum(index + 1)}
-                >
-                  {index + 1}
-                </button>
-              </li>
-            ))}
-
-            {/* Next Button */}
-            <li
-              className={`page-item ${pageNum === totalPages ? "disabled" : ""}`}
-            >
-              <button
-                className="page-link"
-                onClick={() => setPageNum(pageNum + 1)}
-              >
-                Next
-              </button>
-            </li>
-          </ul>
-        </nav>
-      </div>
-
-      {/* Page Size Selector */}
-      <div className="text-center mt-3">
-        <label className="me-2">
-          <strong>Results per page:</strong>
-        </label>
-        <select
-          className="form-select d-inline w-auto"
-          value={pageSize}
-          onChange={(p) => {
-            setPageSize(Number(p.target.value)); // Update page size
-            setPageNum(1); // Reset to first page when changing page size
-          }}
-        >
-          <option value="5">5</option>
-          <option value="10">10</option>
-          <option value="20">20</option>
-        </select>
-      </div>
+      <Pagination
+        currentPage={pageNum}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        onPageChange={setPageNum}
+        onPageSizeChange={(newSize) => {
+          setPageSize(newSize);
+          setPageNum(1);
+        }}
+      />
     </div>
   );
 }
